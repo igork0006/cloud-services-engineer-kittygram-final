@@ -28,7 +28,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - static:/app/collected_static
+      - static:/backend_static
       - media:/app/media
 
 

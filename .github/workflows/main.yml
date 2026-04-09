@@ -6,31 +6,26 @@ on:
       - main
 
 jobs:
-  # tests:
-  #   runs-on: ubuntu-latest
+  tests:
+    runs-on: ubuntu-latest
   
-  #   steps:
-  #     - name: Check out the repo
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
       
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
       
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install flake8==6.0.0 flake8-isort==6.0.0
-  #         pip install -r backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8==6.0.0 flake8-isort==6.0.0
 
-  #     - name: Test with flake8
-  #       run: python -m flake8 backend/
-  #       continue-on-error: true
-
-  #     - name: Run tests
-  #       run: |
-  #         python -m pytest tests/
+      - name: Test with flake8
+        run: python -m flake8 backend/
+        continue-on-error: true
   
   build_and_push_backend:
     name: Build & Push Backend
@@ -85,7 +80,7 @@ jobs:
   build_and_push_gateway:
     name: Build & Push Gateway
     runs-on: ubuntu-latest
-    # needs: tests
+    needs: tests
 
     steps:
       - name: Check out the repo
@@ -155,7 +150,34 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
             sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+  
+  auto_tests:
+    runs-on: ubuntu-latest
+    needs: deploy
+  
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
 
+      - name: Run tests
+        run: |
+          python -m pytest tests/
+  
+  telegram_notification:
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
       - name: Notify Telegram
         uses: appleboy/telegram-action@master
         with:
