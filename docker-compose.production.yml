@@ -22,7 +22,7 @@ services:
 
 
   backend:
-    build: ./backend/
+    image: igork0006/kittygram_backend:latest
     env_file: .env
     depends_on:
       postgres:
@@ -34,7 +34,7 @@ services:
 
   frontend:
     env_file: .env
-    build: ./frontend/
+    image: igork0006/kittygram_frontend:latest
     depends_on:
       - backend
     volumes:
@@ -42,7 +42,7 @@ services:
 
 
   gateway:
-    build: ./nginx/
+    image: igork0006/kittygram_gateway:latest
     env_file: .env
     ports:
       - "8080:80"
