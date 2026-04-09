@@ -1,0 +1,56 @@
+version: '3.8'
+
+# Перечень volume:
+volumes:
+  pg_data:
+  static:
+  media:
+
+
+services:
+  postgres:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+
+  backend:
+    build: ./backend/
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - static:/app/collected_static
+      - media:/app/media
+    command:
+      sh -c "python3 manage.py migrate && python3 manage.py runserver 0:8000"
+
+
+  frontend:
+    env_file: .env
+    build: ./frontend/
+    depends_on:
+      - backend
+    volumes:
+      - static:/app/build
+
+
+  gateway:
+    build: ./nginx/
+    env_file: .env
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - static:/static
+      - media:/media
