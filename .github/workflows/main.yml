@@ -183,4 +183,11 @@ jobs:
         with:
           to: ${{ secrets.TG_CHAT_ID }}
           token: ${{ secrets.TG_BOT_TOKEN }}
-          message: "Kittygram deployed successfully"
+          message: |
+            Kittygram deployed successfully
+            
+            Author: ${{ github.actor }}
+            Commit: ${{ github.event.commits[0].message }}
+            Link: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+            Branch: ${{ github.ref_name }}
+            Time: $(date +'%Y-%m-%d %H:%M:%S')

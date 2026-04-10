@@ -45,10 +45,9 @@ services:
     image: igork0006/kittygram_gateway:latest
     env_file: .env
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - backend
-      - frontend
     volumes:
       - static:/static
       - media:/media
